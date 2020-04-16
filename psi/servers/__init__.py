@@ -6,17 +6,9 @@ class AbstractServer(ABC):
     Server running a specified PSI protocol.
     """
 
-    def __init__(self, ip, port):
+    def __init__(self, elements):
         """
         Args:
-            ip: ip address to listen to
-            port: port number to listen to
+            elements: set set to intersect with the client set.
         """
-        self._ip = ip
-        self._port = port
-
-    def start(self):
-        """
-        Start the server.
-        """
-        pass
+        self._elements = elements
