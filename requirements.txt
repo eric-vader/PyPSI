@@ -1,2 +1,3 @@
+pycrypto
 pybloom-live
 gmpy2
