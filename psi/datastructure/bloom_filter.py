@@ -35,7 +35,7 @@ class BloomFilter:
         return self.check(x)
 
 
-def from_set(X):
+def build_from(X):
     """Create a bloom_filter and add the set X.
 
     Args:
