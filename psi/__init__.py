@@ -1,3 +1,5 @@
+"""Private Set Intersection Library"""
+
 from psi.version import __version__
 
 
