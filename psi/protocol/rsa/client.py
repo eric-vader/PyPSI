@@ -31,19 +31,20 @@ class Client:
 
         return random_factors
 
-    def blind(self, x, rf_encrypted):
+    def blind(self, x, rf):
         """Blind an element using the encryption of a random factor.
 
         Args:
             x: integer in the range [0, n), where n is the RSA modulus.
-            rf_encrypted: the encryption of the random factor.
+            rf: tuple composed of the inverse and encryption of a random
+                factor.
 
         Returns:
             The blinded version of the element integer x.
         """
         assert 0 <= x < self.public_key.n, "x should be in range [0, {})".format(
             self.public_key.n)
-
+        rf_encrypted = rf[1]
         return utils.mulmod(x, rf_encrypted, self.public_key.n)
 
     def blind_set(self, X, random_factors):
@@ -62,8 +63,7 @@ class Client:
 
         blinded_set = []
         for x, rf in zip(X, random_factors):
-            rf_encrypted = rf[1]
-            b = self.blind(x, rf_encrypted)
+            b = self.blind(x, rf)
             blinded_set.append(b)
 
         return blinded_set
