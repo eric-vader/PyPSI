@@ -57,7 +57,7 @@ class Client:
         Returns:
             A list of integers representing the blinded set X.
         """
-        assert len(X) > len(
+        assert len(X) <= len(
             random_factors), "There is more element than random factors"
 
         blinded_set = []
