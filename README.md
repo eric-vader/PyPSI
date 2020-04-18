@@ -1,10 +1,43 @@
 # PyPSI
-A Python library for private set intersection
+![Tests](https://github.com/OpenMined/PyPSI/workflows/Tests/badge.svg)
 
-We'd like to have a library where we could perform private set intersection over a variety of different approaches. The following features of this library are important to us:
-- Support for Paillier HME
-- Support for SEAL HME
-- Identical API for any algorithm
-- Complete interoperability with other OpenMined PSI libraries, allowing you to create keys in one language and use them in another
+A Python library for private set intersection. PyPSI is interoperable with other OpenMined PSI libraries such as [psi.js](https://github.com/OpenMined/psi.js) [SwiftPSI](https://github.com/OpenMined/SwiftPSI) [KotlinPSI](https://github.com/OpenMined/KotlinPSI) and you should be able to implement your PSI client and server in different languages depending on your need.
 
-For SEAL, we could use the following: https://github.com/OpenMined/tenseal
+## PSI Protocols
+
+Our PSI libraries aim at providing different PSI protocols. Below is a list of supported protocols:
+
+- RSA Blind Signature-based PSI (RSA-PSI) as described in this [paper](https://encrypto.de/papers/KLSAP17.pdf), implemented under `psi.protocol.rsa`
+
+## Example
+
+Below is a code snippet showing how to do PSI using the RSA-PSI protocol, this is done locally, however, this should involve communication between a client and a server in a real application scenario.
+
+```python
+from psi.protocol import rsa
+from psi.datastructure import bloom_filter
+
+def run_protocol(client_set, server_set):
+    # BASE
+    server = rsa.Server()
+    public_key = server.public_key
+    client = rsa.Client(public_key)
+    random_factors = client.random_factors(len(client_set))
+    # SETUP
+    signed_server_set = server.sign_set(server_set)
+    bf = bloom_filter.build_from(signed_server_set)
+    # ONLINE
+    A = client.blind_set(client_set, random_factors)
+    B = server.sign_set(A)
+    
+    intr = client.intersect(client_set, B, random_factors, bf)
+    return intr
+
+
+run_protocol([0, 1, 2, 3, 4, 5], [0, 3, 4, 7, 9, 73])
+
+```
+
+## License
+
+[Apache License 2.0](https://github.com/OpenMined/PyPSI/blob/master/LICENSE)
