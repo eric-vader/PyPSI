@@ -119,7 +119,7 @@ class BloomFilter:
 
             return unhexlify(h)
 
-        elif isinstance(x, gmpy2.mpz):
+        elif isinstance(x, type(gmpy2.mpz())):
             return BloomFilter.encode(x.__int__())
 
         else:
