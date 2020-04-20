@@ -21,13 +21,13 @@ class BloomFilter:
         self.bf.add(x)
 
     def check(self, x):
-        """Check either an element is in the bloom filter.
+        """Check whether an element is in the bloom filter.
 
         Args:
             x: element to check
 
         Returns:
-            boolean either x is in the bloom filter (True) or not (False).
+            boolean whether x is possibly in the bloom filter (True) or not (False).
         """
         return x in self.bf
 
