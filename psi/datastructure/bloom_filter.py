@@ -21,13 +21,13 @@ class BloomFilter:
         self.bf.add(x)
 
     def check(self, x):
-        """Check either an element is in the bloom filter.
+        """Check whether an element is in the bloom filter.
 
         Args:
             x: element to check
 
         Returns:
-            boolean either x is in the bloom filter (True) or not (False).
+            boolean whether x is possibly in the bloom filter (True) or not (False).
         """
         return x in self.bf
 
@@ -35,11 +35,12 @@ class BloomFilter:
         return self.check(x)
 
 
-def build_from(X):
+def build_from(X, eps=0.01):
     """Create a bloom_filter and add the set X.
 
     Args:
         X: a list of elements.
+        eps: probability of false positive.
 
     Returns:
         BloomFilter filled with elements of the set X.
