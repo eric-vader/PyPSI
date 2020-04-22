@@ -72,13 +72,13 @@ class BloomFilter:
         self.count += 1
 
     def check(self, x):
-        """Check either an element is in the bloom filter.
+        """Check whether an element is in the bloom filter.
 
         Args:
             x: element to check (bytes).
 
         Returns:
-            boolean either x is in the bloom filter (True) or not (False).
+            boolean whether x is possibly in the bloom filter (True) or not (False).
         """
         hashes = self.hashes(x)
         for h in hashes:
@@ -94,11 +94,12 @@ class BloomFilter:
         return self.count
 
 
-def build_from(X):
+def build_from(X, eps=0.01):
     """Create a bloom_filter and add the set X.
 
     Args:
         X: a list of elements.
+        eps: probability of false positive.
 
     Returns:
         BloomFilter filled with elements of the set X.
