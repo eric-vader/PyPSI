@@ -86,6 +86,8 @@ class Client:
         for y, b, rf in zip(Y, B, random_factors):
             rf_inv = rf[0]
             to_check = utils.mulmod(b, rf_inv, self.public_key.n)
+            # encode to bytes
+            to_check = str(to_check).encode()
             if to_check in bf:
                 result.append(y)
         return result
