@@ -18,19 +18,24 @@ from psi.protocol import rsa
 from psi.datastructure import bloom_filter
 
 def run_protocol(client_set, server_set):
-    # BASE
+    ## BASE
     server = rsa.Server()
     public_key = server.public_key
     client = rsa.Client(public_key)
     random_factors = client.random_factors(len(client_set))
-    # SETUP
+    ## SETUP
     signed_server_set = server.sign_set(server_set)
+    # must encode to bytes
+    signed_server_set = [str(sss).encode() for sss in signed_server_set]
     bf = bloom_filter.build_from(signed_server_set)
-    # ONLINE
+    ## ONLINE
     A = client.blind_set(client_set, random_factors)
     B = server.sign_set(A)
+    unblinded_client_set = client.unblind_set(B, random_factors)
+    # must encode to bytes
+    unblinded_client_set = [str(ucs).encode() for ucs in unblinded_client_set]
     
-    intr = client.intersect(client_set, B, random_factors, bf)
+    intr = client.intersect(client_set, unblinded_client_set, bf)
     return intr
 
 
