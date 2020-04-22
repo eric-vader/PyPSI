@@ -26,35 +26,33 @@ class BloomFilter:
 
         self.max_capacity = capacity
         self.count = 0
-        # compute filter size and num filter for a given fp_prob and capacity
-        self._num_filters = math.ceil(math.log2(1 / fp_prob))
-        self._filter_size = math.ceil(
-            (capacity * abs(math.log(fp_prob))) /
-            (self._num_filters * math.log(2) ** 2)
-        )
+        self._size = math.ceil(-1.44 * capacity * math.log2(fp_prob))
+        self._num_hash_functions = math.ceil(-math.log2(fp_prob))
         # set bitarray
-        size = self._num_filters * self._filter_size
-        self._bitarray = bitarray(size)
+        self._bitarray = bitarray(self._size)
         self._bitarray.setall(0)
 
     def hashes(self, x):
         """Compute the hash of x for the different filters.
 
         Args:
-            x: element to hash.
+            x: element to hash (bytes).
 
         Returns:
             list of hashes, one hash for each filter.
         """
-        x = BloomFilter.encode(x)
+        assert isinstance(x, bytes), "BloomFilter accepts bytes objects"
+
+        hash_func = hashlib.new('sha256')
+        hash_func.update(b'1' + x)
+        h1 = int(hash_func.hexdigest(), 16) % self._size
+        hash_func = hashlib.new('sha256')
+        hash_func.update(b'2' + x)
+        h2 = int(hash_func.hexdigest(), 16) % self._size
+
         hashes = []
-        for i in range(self._num_filters):
-            hash_func = hashlib.new('md5')
-            salt = str(i).zfill(hash_func.block_size).encode()
-            hash_func.update(salt)
-            hash_func.update(x)
-            h = int(hash_func.hexdigest(), 16) % self._filter_size
-            hashes.append(h)
+        for i in range(self._num_hash_functions):
+            hashes.append((h1 + i * h2) % self._size)
 
         return hashes
 
@@ -62,17 +60,14 @@ class BloomFilter:
         """Add an element to the bloom filter.
 
         Args:
-            x: element to add.
+            x: element to add (bytes).
         """
         if self.count >= self.max_capacity:
             raise RuntimeWarning("Bloom filter is at maximum capacity")
 
-        filter_offset = 0
         hashes = self.hashes(x)
         for h in hashes:
-            self._bitarray[filter_offset + h] = 1
-            # next filter
-            filter_offset += self._filter_size
+            self._bitarray[h] = 1
 
         self.count += 1
 
@@ -80,51 +75,17 @@ class BloomFilter:
         """Check either an element is in the bloom filter.
 
         Args:
-            x: element to check
+            x: element to check (bytes).
 
         Returns:
             boolean either x is in the bloom filter (True) or not (False).
         """
-        filter_offset = 0
         hashes = self.hashes(x)
         for h in hashes:
-            if not self._bitarray[filter_offset + h]:
+            if not self._bitarray[h]:
                 return False
-            # next filter
-            filter_offset += self._filter_size
 
         return True
-
-    @classmethod
-    def encode(cls, x):
-        """Encode an element x to be hashed.
-
-        Args:
-            x: element to be encoded.
-
-        Returns:
-            bytes object.
-        """
-        if isinstance(x, int):
-            neg = False
-            if x < 0:
-                neg = True
-                x = abs(x)
-
-            h = hex(x)[2:]
-            if len(h) % 2:
-                h = h.zfill(len(h) + 1)
-            if neg:
-                h = str(ord('-')) + h
-
-            return unhexlify(h)
-
-        elif isinstance(x, type(gmpy2.mpz())):
-            return BloomFilter.encode(x.__int__())
-
-        else:
-            raise NotImplementedError(
-                "encode doesn't support {} objects".format(type(x)))
 
     def __contains__(self, x):
         return self.check(x)
