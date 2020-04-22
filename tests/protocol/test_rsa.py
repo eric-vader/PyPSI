@@ -30,6 +30,8 @@ def run_protocol(client_set, server_set):
     signed_server_set = server.sign_set(server_set)
     # Can also do this
     # signed_server_set = [server.sign(x) for x in server_set]
+    # encode server set to bytes before adding them to bf
+    signed_server_set = [str(sss).encode() for sss in signed_server_set]
     bf = bloom_filter.build_from(signed_server_set)
     # ONLINE
     A = client.blind_set(client_set, random_factors)
