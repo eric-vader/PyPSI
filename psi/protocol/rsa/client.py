@@ -47,6 +47,22 @@ class Client:
         rf_encrypted = rf[1]
         return utils.mulmod(x, rf_encrypted, self.public_key.n)
 
+    def unblind(self, x, rf):
+        """Blind an element using the inverse of a random factor.
+
+        Args:
+            x: integer in the range [0, n), where n is the RSA modulus.
+            rf: tuple composed of the inverse and encryption of a random
+                factor.
+
+        Returns:
+            The unblinded version of the blinded element x.
+        """
+        assert 0 <= x < self.public_key.n, "x should be in range [0, {})".format(
+            self.public_key.n)
+        rf_inv = rf[0]
+        return utils.mulmod(x, rf_inv, self.public_key.n)
+
     def blind_set(self, X, random_factors):
         """Blind a set of elements using the encryption of random factors.
 
@@ -68,14 +84,33 @@ class Client:
 
         return blinded_set
 
-    def intersect(self, Y, B, random_factors, bf):
+    def unblind_set(self, X, random_factors):
+        """Unblind a set of elements using the inverse of random factors.
+
+        Args:
+            X: list of integers in the range [0, n), where n is the RSA modulus.
+            random_factor: list of tuples, each tuple is composed of the inverse and 
+                encryption of a random factor.
+
+        Returns:
+            A list of integers representing the unblinded set X.
+        """
+        assert len(X) <= len(
+            random_factors), "There is more element than random factors"
+
+        unblinded_set = []
+        for x, rf in zip(X, random_factors):
+            u = self.unblind(x, rf)
+            unblinded_set.append(u)
+
+        return unblinded_set
+
+    def intersect(self, Y, B, bf):
         """Compute the intersection of the client and server set.
 
         Args:
-            Y: client set.
-            B: signatures of the blinded client set.
-            random_factors: list of tuples, each tuple is composed of the inverse and 
-                encryption of a random factor.
+            Y: oredered client set.
+            B: oredered signatures of the client set (unblinded).
             bf: bloom filter filled with the signed server set.
 
         Returns:
@@ -83,11 +118,7 @@ class Client:
             server set.
         """
         result = []
-        for y, b, rf in zip(Y, B, random_factors):
-            rf_inv = rf[0]
-            to_check = utils.mulmod(b, rf_inv, self.public_key.n)
-            # encode to bytes
-            to_check = str(to_check).encode()
-            if to_check in bf:
+        for y, b in zip(Y, B):
+            if b in bf:
                 result.append(y)
         return result
