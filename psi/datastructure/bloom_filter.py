@@ -95,17 +95,26 @@ class BloomFilter:
         return self.count
 
 
-def build_from(X, eps=0.01):
+def build_from(X, capacity=None, fp_prob=None):
     """Create a bloom_filter and add the set X.
 
     Args:
         X: a list of elements.
-        eps: probability of false positive.
+        capacity: maximum capacity of the bloom filter, set to len(X) if not
+            specified.
+        fp_prob: probability of false positives.
 
     Returns:
         BloomFilter filled with elements of the set X.
     """
-    bf = BloomFilter(len(X))
+    if capacity is None:
+        capacity = len(X)
+
+    if fp_prob is None:
+        bf = BloomFilter(capacity)
+    else:
+        bf = BloomFilter(capacity, fp_prob)
+
     for x in X:
         bf.add(x)
 
