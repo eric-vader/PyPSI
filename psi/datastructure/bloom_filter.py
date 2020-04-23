@@ -26,7 +26,8 @@ class BloomFilter:
 
         self.max_capacity = capacity
         self.count = 0
-        self._size = math.ceil(-1.44 * capacity * math.log2(fp_prob))
+        self._size = math.ceil(-capacity * math.log2(fp_prob) / math.log(2))
+        self._size = math.ceil(self._size / 8) * 8
         self._num_hash_functions = math.ceil(-math.log2(fp_prob))
         # set bitarray
         self._bitarray = bitarray(self._size)

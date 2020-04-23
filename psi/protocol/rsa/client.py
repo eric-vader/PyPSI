@@ -75,7 +75,7 @@ class Client:
             A list of integers representing the blinded set X.
         """
         assert len(X) <= len(
-            random_factors), "There is more element than random factors"
+            random_factors), "There are more elements than random factors"
 
         blinded_set = []
         for x, rf in zip(X, random_factors):
@@ -96,7 +96,7 @@ class Client:
             A list of integers representing the unblinded set X.
         """
         assert len(X) <= len(
-            random_factors), "There is more element than random factors"
+            random_factors), "There are more elements than random factors"
 
         unblinded_set = []
         for x, rf in zip(X, random_factors):
@@ -109,8 +109,8 @@ class Client:
         """Compute the intersection of the client and server set.
 
         Args:
-            Y: oredered client set.
-            B: oredered signatures of the client set (unblinded).
+            Y: ordered client set.
+            B: ordered signatures of the client set (unblinded).
             bf: bloom filter filled with the signed server set.
 
         Returns:
