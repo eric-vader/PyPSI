@@ -4,12 +4,12 @@ from psi.protocol.rsa import utils
 
 
 class Server:
-    """Server for doing RSA-PSI protocol"""
+    """Server for RSA-PSI protocol"""
 
     def __init__(self, private_key=None, key_size=2048, e=0x10001):
         """
         Args:
-            private_key: RSA private-key, a key will be generate using
+            private_key: RSA private key, a key will be generated using
                 e and key_size if it's not provided.
             key_size: size in bits of the key.
             e: RSA public exponent.
@@ -26,7 +26,7 @@ class Server:
         return self.public_key, self.private_key
 
     def sign(self, x):
-        """Sign a single element using the RSA private-key.
+        """Sign a single element using the RSA private key.
 
         Args:
             x: integer in the range [0, n), where n is the RSA modulus.
@@ -40,7 +40,7 @@ class Server:
         return utils.sign(self.private_key, x)
 
     def sign_set(self, X):
-        """Sign a set of elements using the RSA private-key.
+        """Sign a set of elements using the RSA private key.
 
         Args:
             X: list of integers in the range [0, n), where n is the RSA modulus.

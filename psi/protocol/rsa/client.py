@@ -3,23 +3,23 @@ from psi.protocol.rsa import utils
 
 
 class Client:
-    """Client for doing RSA-PSI protocol"""
+    """Client for RSA-PSI protocol"""
 
     def __init__(self, public_key):
         """
         Args:
-            rsa_public_key: RSA public-key.
+            rsa_public_key: RSA public key.
         """
         self.public_key = public_key
 
     def random_factors(self, n_elements):
-        """Generate n_elements random factors, then inverse and encrypt them.
+        """Generate n_elements random factors, then invert and encrypt them.
 
         Args:
             n_elements: number of random factors to generate.
 
         Returns:
-            A list of tuples, each tuple is composed of the inverse and 
+            A list of tuples, each tuple is composed of the inverse and
             encryption of a random factor.
         """
         random_factors = []
@@ -68,7 +68,7 @@ class Client:
 
         Args:
             X: list of integers in the range [0, n), where n is the RSA modulus.
-            random_factor: list of tuples, each tuple is composed of the inverse and 
+            random_factor: list of tuples, each tuple is composed of the inverse and
                 encryption of a random factor.
 
         Returns:
@@ -88,8 +88,9 @@ class Client:
         """Unblind a set of elements using the inverse of random factors.
 
         Args:
+
             X: list of integers in the range [0, n), where n is the RSA modulus.
-            random_factor: list of tuples, each tuple is composed of the inverse and 
+            random_factors: list of tuples, each tuple is composed of the inverse and 
                 encryption of a random factor.
 
         Returns:
@@ -114,7 +115,7 @@ class Client:
             bf: bloom filter filled with the signed server set.
 
         Returns:
-            A list of integer representing the intersection of the client and 
+            A list of integers representing the intersection of the client and
             server set.
         """
         result = []
