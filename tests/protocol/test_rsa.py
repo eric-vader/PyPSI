@@ -30,6 +30,8 @@ def run_protocol(client_set, server_set):
     signed_server_set = server.sign_set(server_set)
     # Can also do this
     # signed_server_set = [server.sign(x) for x in server_set]
+    # encode
+    signed_server_set = [str(sss).encode() for sss in signed_server_set]
     bf = bloom_filter.build_from(signed_server_set)
     # ONLINE
     A = client.blind_set(client_set, random_factors)
@@ -38,6 +40,9 @@ def run_protocol(client_set, server_set):
     B = server.sign_set(A)
     # Can also do this
     # B = [server.sign(x) for x in A]
-    intr = client.intersect(client_set, B, random_factors, bf)
+    unblinded_client_set = client.unblind_set(B, random_factors)
+    # encode
+    unblinded_client_set = [str(ucs).encode() for ucs in unblinded_client_set]
+    intr = client.intersect(client_set, unblinded_client_set, bf)
 
     return intr
