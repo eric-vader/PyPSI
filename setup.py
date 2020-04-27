@@ -23,6 +23,7 @@ setuptools.setup(
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
     url="https://github.com/OpenMined/PyPSI",
+    install_requires=read("requirements.txt").split("\n"),
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
