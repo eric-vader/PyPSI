@@ -90,8 +90,11 @@ class BloomFilter:
         return True
 
     def export(self):
-        """Export the bloom filter to a dictionarry, which can be then serialized
+        """Export the bloom filter to a dictionary, which can be then serialized
         with json.
+
+        Returns:
+            dictionary of format {"num_hash_functions": int, "bits": str}.
         """
         bitarray_b64 = base64.encodebytes(self._bitarray.tobytes())
         bitarray_b64 = bitarray_b64.replace(b'\n', b'').decode()
@@ -104,12 +107,22 @@ class BloomFilter:
 
     @staticmethod
     def from_dict(bf_dict):
-        num_hash_functions = bf_dict["num_hash_functions"]
-        bits_as_bytes = base64.decodebytes(bf_dict["bits"])
+        """Construct a bloom filter from a dictionary exporting a bloom filter.
+        
+        Args:
+            bf_dict: dictionary of format {"num_hash_functions": int, "bits": str}.
 
-        bf = BloomFilter(capacity=1)  # capacity doesn't matter since we overwrite
+        Return:
+            Bloom Filter.
+        """
+
+        num_hash_functions = bf_dict["num_hash_functions"]
+        bits_as_bytes = base64.decodebytes(bf_dict["bits"].encode())
+
+        # capacity doesn't matter since we overwrite it
+        bf = BloomFilter(capacity=1)
         bf._num_hash_functions = num_hash_functions
-        bf._bitarray = bitarray()
+        bf._bitarray = bitarray(endian='little')
         bf._bitarray.frombytes(bits_as_bytes)
         bf._size = len(bits_as_bytes) * 8
         # set to random values for the moment

@@ -29,10 +29,19 @@ def test_serialization():
                      "0CFVIMn91Bdc7jLkXHXrXp1NimmZSDrYSj5sd/500nroNOdXbtd53u8c"
                      "ejPMGxbx7kR1E1zyO19mSkYLXq4xf7au5dFN0qhxqfLnjaCE")
 
+    elements = []
     for i in range(capacity):
         x = "Element {}".format(i).encode()
         bf.add(x)
+        elements.append(x)
 
     serialized = bf.export()
     assert serialized["num_hash_functions"] == expected_num_hash_functions
     assert serialized["bits"] == expected_bits
+
+    # deserialization
+    deser_bf = bloom_filter.BloomFilter.from_dict(serialized)
+    assert deser_bf._num_hash_functions == bf._num_hash_functions
+    assert deser_bf._bitarray == bf._bitarray
+    for e in elements:
+        assert e in bf
