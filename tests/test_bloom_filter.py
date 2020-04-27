@@ -17,3 +17,22 @@ def test_bf(elements):
     assert len(bf) == len(elements)
     for e in elements:
         assert e in bf
+
+
+def test_serialization():
+    # same test as cpp
+    capacity = 100
+    fp_prob = 0.01
+    bf = bloom_filter.BloomFilter(capacity, fp_prob)
+    expected_num_hash_functions = 7
+    expected_bits = ("VN3/BXfUjEDvJLcxCTepUCTXGQwlTax0xHiMohCNb45uShFsznK099RH"
+                     "0CFVIMn91Bdc7jLkXHXrXp1NimmZSDrYSj5sd/500nroNOdXbtd53u8c"
+                     "ejPMGxbx7kR1E1zyO19mSkYLXq4xf7au5dFN0qhxqfLnjaCE")
+
+    for i in range(capacity):
+        x = "Element {}".format(i).encode()
+        bf.add(x)
+
+    serialized = bf.export()
+    assert serialized["num_hash_functions"] == expected_num_hash_functions
+    assert serialized["bits"] == expected_bits
