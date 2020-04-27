@@ -1,6 +1,7 @@
 import math
 import hashlib
 import gmpy2
+import base64
 from binascii import unhexlify
 from bitarray import bitarray
 
@@ -30,7 +31,7 @@ class BloomFilter:
         self._size = math.ceil(self._size / 8) * 8
         self._num_hash_functions = math.ceil(-math.log2(fp_prob))
         # set bitarray
-        self._bitarray = bitarray(self._size)
+        self._bitarray = bitarray(self._size, endian='little')
         self._bitarray.setall(0)
 
     def hashes(self, x):
@@ -87,6 +88,35 @@ class BloomFilter:
                 return False
 
         return True
+
+    def export(self):
+        """Export the bloom filter to a dictionarry, which can be then serialized
+        with json.
+        """
+        bitarray_b64 = base64.encodebytes(self._bitarray.tobytes())
+        bitarray_b64 = bitarray_b64.replace(b'\n', b'').decode()
+        num_hash_functions = self._num_hash_functions
+        bf_dict = {
+            "num_hash_functions": num_hash_functions,
+            "bits": bitarray_b64,
+        }
+        return bf_dict
+
+    @staticmethod
+    def from_dict(bf_dict):
+        num_hash_functions = bf_dict["num_hash_functions"]
+        bits_as_bytes = base64.decodebytes(bf_dict["bits"])
+
+        bf = BloomFilter(capacity=1)  # capacity doesn't matter since we overwrite
+        bf._num_hash_functions = num_hash_functions
+        bf._bitarray = bitarray()
+        bf._bitarray.frombytes(bits_as_bytes)
+        bf._size = len(bits_as_bytes) * 8
+        # set to random values for the moment
+        bf.max_capacity = bf._size
+        bf.count = 0
+
+        return bf
 
     def __contains__(self, x):
         return self.check(x)
